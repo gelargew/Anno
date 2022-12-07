@@ -13,16 +13,18 @@ const img = ref(null);
 let anno: any = null;
 
 const formatter = (annotation: any) => {
-  console.log(annotation.bodies);
-  const label = annotation.bodies.find((item: any) => item.category);
+  const selected = annotation.bodies[0];
+
   const foreignObject = document.createElementNS(
     "http://www.w3.org/2000/svg",
     "foreignObject"
   );
-  foreignObject.innerHTML = `<label xmlns="http://www.w3.org/1999/xhtml">HELLO</label>`;
+  if (selected)
+    foreignObject.innerHTML = `<label xmlns="http://www.w3.org/1999/xhtml">${selected.category}</label>`;
 
   return {
     element: foreignObject,
+    className: "annotationCategory",
   };
 };
 
@@ -50,9 +52,7 @@ onMounted(() => {
     await anno.updateSelected(selection);
     anno.saveSelected();
   });
-  anno.on("createAnnotation", (annotation: any) => {
-    console.log(annotation);
-  });
+  anno.on("createAnnotation", (annotation: any) => {});
 });
 </script>
 
@@ -75,6 +75,9 @@ onMounted(() => {
         <li
           @:click="selectedCategory = category"
           v-for="category in categories"
+          :class="{
+            active: selectedCategory === category,
+          }"
         >
           {{ category }}
         </li>
@@ -130,28 +133,7 @@ svg.a9s-annotationlayer {
   opacity: 1;
 }
 
-svg.a9s-annotationlayer .a9s-annotation.RED .a9s-outer {
-  stroke: red;
-  stroke-width: 3;
-  fill: rgba(255, 0, 0, 0.3);
-}
-
-svg.a9s-annotationlayer .a9s-annotation.GREEN .a9s-outer {
-  stroke: green;
-  stroke-width: 3;
-  fill: rgba(0, 255, 0, 0.3);
-}
-
-svg.a9s-annotationlayer .a9s-annotation.BLUE .a9s-outer {
-  stroke: blue;
-  stroke-width: 3;
-  fill: rgba(0, 0, 255, 0.3);
-}
-
-svg.a9s-annotationlayer .a9s-annotation.RED .a9s-inner,
-svg.a9s-annotationlayer .a9s-annotation.GREEN .a9s-inner,
-svg.a9s-annotationlayer .a9s-annotation.BLUE .a9s-inner {
-  fill: transparent;
-  stroke: none;
+.active {
+  background: red;
 }
 </style>

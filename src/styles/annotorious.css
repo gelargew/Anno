@@ -556,6 +556,6 @@
 
 .a9s-annotation foreignObject label {
   display: inline-block;
-  padding: 3px 8px;
-  transform: translateY(-100%) translateX(-1px);
+  padding: 0 8px;
+  transform: translateY(-20%) translateX(-100%);
 }
