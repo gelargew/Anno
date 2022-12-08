@@ -1,7 +1,28 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, reactive } from "vue";
 import { Annotorious } from "@recogito/annotorious";
 import "../styles/annotorious.css";
+
+const DUMMY = {
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  type: "Annotation",
+  body: [
+    {
+      category: "tops",
+      subCategory: ["foo", "bar", "baz"],
+    },
+  ],
+  target: {
+    source:
+      "https://www.solidbackgrounds.com/images/1600x900/1600x900-black-solid-color-background.jpg",
+    selector: {
+      type: "FragmentSelector",
+      conformsTo: "http://www.w3.org/TR/media-frags/",
+      value:
+        "xywh=pixel:651.3306274414062,133.4931640625,761.8317260742188,342.9393310546875",
+    },
+  },
+};
 
 defineProps<{ msg: string }>();
 const annotations = ref<any[]>([]);
@@ -10,6 +31,10 @@ const selectedCategory = ref("tops");
 
 const count = ref(0);
 const img = ref(null);
+const layouts = reactive({
+  comments: true,
+  labels: true,
+});
 let anno: any = null;
 
 const formatter = (annotation: any) => {
@@ -24,14 +49,14 @@ const formatter = (annotation: any) => {
 
   return {
     element: foreignObject,
-    className: "annotationCategory",
+    className: selected && "category" in selected ? "annotationLabels" : "",
   };
 };
 
 const innitAnno = () => {
   anno = new Annotorious({
     image: img.value,
-    widgets: [],
+    widgets: ["COMMENT"],
     allowEmpty: true,
     formatter: formatter,
   });
@@ -49,15 +74,52 @@ onMounted(() => {
         subCategory: ["foo", "bar", "baz"],
       },
     ];
-    await anno.updateSelected(selection);
-    anno.saveSelected();
+    if (layouts.labels) {
+      await anno.updateSelected(selection);
+      anno.saveSelected();
+    }
   });
-  anno.on("createAnnotation", (annotation: any) => {});
+  anno.on("createAnnotation", (annotation: any) => {
+    console.log(annotation);
+  });
 });
+
+watch(layouts, () => {
+  const labels = document.querySelectorAll(".annotationLabels");
+  if (layouts.labels) {
+    labels.forEach((el) => {
+      el.classList.remove("none");
+    });
+  } else {
+    labels.forEach((el) => {
+      el.classList.add("none");
+    });
+  }
+  console.log(labels);
+});
+
+const addAnno = () => {
+  anno.addAnnotation(DUMMY);
+  console.log("--add");
+};
 </script>
 
 <template>
-  <h1 v-on:click="log()">{{ msg }}</h1>
+  <h1 v-on:click="addAnno">{{ msg }}</h1>
+  <div>
+    <button
+      :class="{ active: layouts.labels }"
+      @:click="layouts.labels = !layouts.labels"
+    >
+      Labels
+    </button>
+    <button
+      :class="{ active: layouts.comments }"
+      @:click="layouts.comments = !layouts.comments"
+    >
+      Comments
+    </button>
+  </div>
   <div>
     <div class="imgWrapper">
       <img
@@ -135,5 +197,8 @@ svg.a9s-annotationlayer {
 
 .active {
   background: red;
+}
+.none {
+  display: none;
 }
 </style>

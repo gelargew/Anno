@@ -192,6 +192,7 @@
   min-height: 2em;
   font-size: 14px;
   font-family: Lato, sans-serif;
+  color: black;
 }
 .r6o-editable-text:empty:not(:focus):before {
   content: attr(data-placeholder);
