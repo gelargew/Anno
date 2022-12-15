@@ -79,7 +79,7 @@ onMounted(() => {
       anno.saveSelected();
     }
   });
-  anno.on("createAnnotation", (annotation: any) => {
+  anno.on("startSelection", (annotation: any) => {
     console.log(annotation);
   });
 });
