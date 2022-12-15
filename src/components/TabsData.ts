@@ -63,55 +63,35 @@ export const TabsData = [
 
 export const DUMMY_CATEGORIES = [
   {
+    id: "1",
     name: "TOPS",
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
+    attributeOptions: {
+      class: ["shirt", "blouse"],
+      subclass: ["formal", "denim"],
+    },
   },
   {
+    id: "2",
     name: "Bottoms",
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
+    attributeOptions: {
+      class: ["shirt", "blouse"],
+      subclass: ["formal", "denim"],
+    },
   },
   {
+    id: "3",
     name: "Dresses/Jumpsuits",
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
+    attributeOptions: {
+      class: ["shirt", "blouse"],
+      subclass: ["formal", "denim"],
+    },
   },
   {
+    id: "4",
     name: "Outerwear",
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
+    attributeOptions: {
+      class: ["shirt", "blouse"],
+      subclass: ["formal", "denim"],
+    },
   },
 ];

@@ -8,15 +8,44 @@ import { ObjectListType } from "../types";
 
 const objectList = ref<ObjectListType[]>([]);
 const selectedObject = ref<typeof DUMMY_CATEGORIES[0] | null>(null);
-const currentObjectIndex = ref(99);
+const currentObjectIndex = ref<"none" | number>("none");
 const currentAttributeStep = ref(0);
 
+// LABELS
+const labelOptions = ref<{ [key: string]: string[] } | null>(null);
+const labelStep = ref(0);
+const labelData = ref<{ [key: string]: string | null }>({});
+
+const saveLabel = () => {
+  if (currentObjectIndex.value != "none") {
+    const object = DUMMY_CATEGORIES[currentObjectIndex.value];
+    objectList.value.push(object);
+    currentObjectIndex.value = "none";
+    labelOptions.value = null;
+    labelStep.value = 0;
+    labelData.value = {};
+  }
+};
+
+watch(
+  () => currentObjectIndex.value,
+  (newVal) => {
+    if (newVal !== "none") {
+      labelOptions.value = DUMMY_CATEGORIES[newVal].attributeOptions;
+      labelData.value = {};
+    }
+  }
+);
+
 const log = (e: any) => {
-  console.log(selectedObject.value);
+  labelData.value[e.target.name] = e.target.value;
 };
 </script>
 
 <template>
+  <div>
+    <pre>{{ JSON.stringify(labelData) }}</pre>
+  </div>
   <div class="container">
     <nav class="annotator-tabs">
       <button v-for="tab in TabsData">
@@ -29,48 +58,60 @@ const log = (e: any) => {
       <h1 @click="log">ANNOTATOR</h1>
     </div>
     <div class="options">
-      <div v-if="!selectedObject">
+      <div v-if="currentObjectIndex === 'none'">
         <h4>Category</h4>
         <ul>
-          <li
-            @click="() => (currentAttributeStep = i)"
-            v-for="(category, i) in DUMMY_CATEGORIES"
-          >
-            {{ category.name }}
+          <li v-for="(category, i) in DUMMY_CATEGORIES">
+            <button
+              @click="
+                () => {
+                  currentObjectIndex = i;
+                }
+              "
+            >
+              {{ category.name }}
+            </button>
           </li>
         </ul>
       </div>
-      <div v-else>
+      <div v-else-if="labelOptions">
         <div class="flex">
-          <span>back</span>
+          <button v-if="labelStep" @click="() => labelStep--">back</button>
           <h4>
-            {{
-              DUMMY_CATEGORIES[currentObjectIndex].classes[currentAttributeStep]
-                .title
-            }}
+            {{ DUMMY_CATEGORIES[currentObjectIndex].id }}
           </h4>
-          <span>next</span>
+          <button
+            v-if="labelStep + 1 < Object.keys(labelOptions).length"
+            @click="() => labelStep++"
+          >
+            next
+          </button>
         </div>
 
         <ul>
           <fieldset @change="log">
-            <li
-              v-for="attribute in DUMMY_CATEGORIES[currentObjectIndex].classes[
-                currentAttributeStep
-              ].option"
-            >
+            <li v-for="attribute in labelOptions[labelStep].option">
               <input
+                :checked="
+                  labelData[labelOptions[labelStep].title] === attribute
+                "
                 type="radio"
-                :name="DUMMY_CATEGORIES[currentObjectIndex].name"
+                :name="labelOptions[labelStep].title"
                 :value="attribute"
               />
               <span>{{ attribute }}</span>
             </li>
           </fieldset>
         </ul>
-        <button>Next</button>
+        <button
+          v-if="labelStep + 1 < labelOptions.length"
+          @click="() => labelStep++"
+        >
+          Next
+        </button>
+        <button v-else>Submit</button>
       </div>
-      <div v-if="!selectedObject">
+      <div v-if="currentObjectIndex === 'none'">
         <h4>Object List</h4>
         <ul>
           <li v-for="(object, i) in objectList" :key="i">
