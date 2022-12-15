@@ -65,33 +65,57 @@ export const DUMMY_CATEGORIES = [
   {
     id: "1",
     name: "TOPS",
-    attributeOptions: {
-      class: ["shirt", "blouse"],
-      subclass: ["formal", "denim"],
-    },
+    classes: [
+      {
+        title: "class",
+        option: ["shirt", "blouse"],
+      },
+      {
+        title: "subclass",
+        option: ["formal", "denim"],
+      },
+    ],
   },
   {
     id: "2",
     name: "Bottoms",
-    attributeOptions: {
-      class: ["shirt", "blouse"],
-      subclass: ["formal", "denim"],
-    },
+    classes: [
+      {
+        title: "class",
+        option: ["shirt", "blouse"],
+      },
+      {
+        title: "subclass",
+        option: ["formal", "denim"],
+      },
+    ],
   },
   {
     id: "3",
     name: "Dresses/Jumpsuits",
-    attributeOptions: {
-      class: ["shirt", "blouse"],
-      subclass: ["formal", "denim"],
-    },
+    classes: [
+      {
+        title: "class",
+        option: ["shirt", "blouse"],
+      },
+      {
+        title: "subclass",
+        option: ["formal", "denim"],
+      },
+    ],
   },
   {
     id: "4",
     name: "Outerwear",
-    attributeOptions: {
-      class: ["shirt", "blouse"],
-      subclass: ["formal", "denim"],
-    },
+    classes: [
+      {
+        title: "class",
+        option: ["shirt", "blouse"],
+      },
+      {
+        title: "subclass",
+        option: ["formal", "denim"],
+      },
+    ],
   },
 ];
