@@ -6,8 +6,8 @@ import TaskPlatform from "./components/TaskPlatform.vue";
 </script>
 
 <template>
-  <HelloWorld msg="Anno" />
-  <!-- <TaskPlatform /> -->
+  <!-- <HelloWorld msg="Anno" /> -->
+  <TaskPlatform />
 </template>
 
 <style scoped>
