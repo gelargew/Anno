@@ -243,7 +243,11 @@ const notReadOnly = () => {
           <fieldset
             @change="
               (e) => {
-                updateAttribute(labelOptions[labelStep].title, e.target.value);
+
+                if (labelOptions && e.target) {
+                  updateAttribute(labelOptions[labelStep].title, (e.target as HTMLInputElement).value);
+                }
+                
               }
             "
           >
