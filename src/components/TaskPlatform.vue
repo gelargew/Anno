@@ -193,9 +193,7 @@ const notReadOnly = () => {
   <div class="container">
     <nav class="annotator-tabs">
       <button v-for="tab in TabsData">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Pi-symbol.svg/2116px-Pi-symbol.svg.png"
-        />
+        <img src="#" />
         <p>{{ tab.title }}</p>
         <p>({{ tab.shortcut }})</p>
       </button>
