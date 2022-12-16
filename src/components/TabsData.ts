@@ -59,6 +59,11 @@ export const TabsData = [
       },
     ],
   },
+  {
+    title: "Report",
+    shortcut: "T",
+    id: 5,
+  },
 ];
 
 export const DUMMY_CATEGORIES = [
