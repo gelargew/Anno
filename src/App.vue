@@ -3,11 +3,20 @@
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import HelloWorld from "./components/HelloWorld.vue";
 import TaskPlatform from "./components/TaskPlatform.vue";
+import * as VueRouter from "vue-router";
+import Vue from "vue";
 </script>
 
 <template>
+  <nav>
+    <router-link to="/">
+      <img alt="Vue logo" src="../assets/logo.png" class="logo" />
+    </router-link>
+    <router-link to="/test">Test</router-link>
+  </nav>
   <!-- <HelloWorld msg="Anno" /> -->
-  <TaskPlatform />
+  <!-- <TaskPlatform /> -->
+  <router-view />
 </template>
 
 <style scoped>
