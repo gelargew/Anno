@@ -37,6 +37,7 @@ export const useTaskStore = () => {
   };
 
   const setCategories = (category: CategoryProps) => {
+    console.log(category.id);
     categories.value[category.id] = category;
   };
 

@@ -1,0 +1,38 @@
+export const DUMMY_CATEGORIES = [
+  {
+    id: 49,
+    categoryName: "Tops",
+    version: "1",
+    color: "[51, 153, 255]",
+    createdAt: "2022-12-16T07:17:57.000Z",
+    updatedAt: "2022-12-16T07:17:57.000Z",
+    function_types: true,
+  },
+  {
+    id: 1,
+    categoryName: "Bottoms",
+    version: "1",
+    color: "[51, 22, 242]",
+    createdAt: "2022-12-16T07:17:57.000Z",
+    updatedAt: "2022-12-16T07:17:57.000Z",
+    function_types: true,
+  },
+  {
+    id: 2,
+    categoryName: "Jackets",
+    version: "1",
+    color: "[111, 99, 200]",
+    createdAt: "2022-12-16T07:17:57.000Z",
+    updatedAt: "2022-12-16T07:17:57.000Z",
+    function_types: true,
+  },
+  {
+    id: 3,
+    categoryName: "Hat",
+    version: "1",
+    color: "[200, 60, 1]",
+    createdAt: "2022-12-16T07:17:57.000Z",
+    updatedAt: "2022-12-16T07:17:57.000Z",
+    function_types: true,
+  },
+];

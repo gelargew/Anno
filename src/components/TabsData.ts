@@ -17,7 +17,7 @@ export const TabsData = [
     shortcut: "e",
     id: 1,
     iconUrl: AttributeIcon,
-    disabledWithoutCategory: true,
+    disabledWithoutCategory: false,
   },
   {
     title: "Labels",

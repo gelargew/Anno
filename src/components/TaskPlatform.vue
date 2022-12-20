@@ -45,6 +45,7 @@ const formatter = (annotation: any) => {
   return {
     element: foreignObject,
     className: selected && "category" in selected ? "annotationLabels" : "",
+    style: "stroke: black;",
   };
 };
 
@@ -61,11 +62,21 @@ const innitAnno = () => {
 };
 onMounted(() => {
   innitAnno();
-  anno.on("createSelection", async (selection: any) => {
-    anno.cancelSelected();
+  anno.on("cancelSelected", () => {
+    console.log("cancelSelected");
+    setActiveCategory(null);
   });
-  anno.on("cancelSelected", function (selection: any) {
-    anno.saveSelected();
+  anno.on("createSelection", async (selection: any) => {
+    console.log(selection);
+    if (activeCategory.value) {
+      setCategories({
+        ...activeCategory.value,
+        annotationData: selection,
+      });
+      anno.saveSelected();
+    } else {
+      anno.cancelSelected();
+    }
   });
 });
 
@@ -132,9 +143,7 @@ const updateAttribute = (key: string, value: string) => {
   }
 };
 
-const log = () => {
-  console.log(annotations.value);
-};
+const log = () => {};
 
 const onSelectCategory = (category: CategoryProps) => {
   if (activeTab.value.id === 1) {
@@ -161,11 +170,20 @@ watch([activeTab, activeCategory], (prev, next) => {
     anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
   }
   // on label tab & select category
-  if (activeTab.value.id === 2 && activeCategory.value) {
-    anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
-    anno.disableSelect = anno.disableSelect
-      ? !anno.disableSelect
-      : anno.disableSelect;
+  if (activeTab.value.id === 1 && activeCategory.value) {
+    const selectCategory = categories.value[activeCategory.value.id.toString()];
+    if (selectCategory) {
+      console.log(selectCategory.annotationData, "selectCategory");
+      anno.selectAnnotation(selectCategory.annotationData);
+      anno.disableSelect = anno.disableSelect
+        ? anno.disableSelect
+        : !anno.disableSelect;
+    } else {
+      anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
+      anno.disableSelect = anno.disableSelect
+        ? !anno.disableSelect
+        : anno.disableSelect;
+    }
   } else {
     anno.readOnly = anno.readOnly ? anno.readOnly : !anno.readOnly;
     anno.disableSelect = anno.disableSelect
@@ -205,13 +223,23 @@ watch([activeTab, activeCategory], (prev, next) => {
       </button>
     </nav>
     <!-- ANNOTATOR -->
-    <div class="annotatorWrapper">
-      <div class="imgWrapper">
-        <img
-          ref="img"
-          class="annotatorImg"
-          src="https://images.unsplash.com/photo-1540324155974-7523202daa3f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=715&q=80"
-        />
+    <div>
+      <div class="annotatorWrapper">
+        <div class="imgWrapper">
+          <img
+            ref="img"
+            class="annotatorImg"
+            src="https://images.unsplash.com/photo-1540324155974-7523202daa3f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=715&q=80"
+          />
+        </div>
+      </div>
+      <div class="bottomMenu">
+        <p></p>
+        <nav>
+          <p>1 / 100</p>
+          <a href="#">&gt;</a>
+        </nav>
+        <button>SAVE</button>
       </div>
     </div>
     <!-- OPTIONS -->
@@ -219,9 +247,9 @@ watch([activeTab, activeCategory], (prev, next) => {
       <div
         class="category"
         :class="{
-          active: activeTab.id === 1 || activeTab.id === 2,
+          active: activeTab.id === 1 || activeTab.id === 3,
         }"
-        v-if="activeTab.id != 1"
+        v-if="true"
       >
         <h4>Category</h4>
         <ul>
@@ -348,8 +376,24 @@ watch([activeTab, activeCategory], (prev, next) => {
   background: #0085ff;
   color: white;
 }
+
+.annotator-tabs button.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .annotator-tabs button.active img {
   filter: invert(1);
+}
+
+.bottomMenu {
+  display: flex;
+  justify-content: space-between;
+  place-items: center;
+  padding: 1rem 0;
+}
+.bottomMenu nav {
+  display: flex;
 }
 
 .options {
