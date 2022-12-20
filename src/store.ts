@@ -1,5 +1,6 @@
 import { ref, watch } from "vue";
 import { TabsData, TabsProps } from "./components/TabsData";
+import { AttributeNameProps, AttributeOptionProps } from "./types";
 
 type ActiveTabs =
   | "report"
@@ -12,10 +13,7 @@ type ActiveTabs =
 export interface CategoryProps {
   name: string;
   id: string;
-  classes: {
-    title: string;
-    option: string[];
-  }[];
+  attributes: AttributeOptionProps;
   annotationData?: any;
 }
 
@@ -24,9 +22,9 @@ export const useTaskStore = () => {
   const action = ref<ActiveTabs>("report");
   const annotations = ref<any[]>([]);
   const activeCategory = ref<CategoryProps | null>(null);
-  const categories = ref<{
-    [key: string]: CategoryProps;
-  }>({});
+  const categories = ref<CategoryProps[]>([]);
+  const selectedAttribueOption = ref<AttributeNameProps | null>(null);
+
   let anno = null;
 
   const addAnnotation = (annotation: any) => {
@@ -38,12 +36,20 @@ export const useTaskStore = () => {
 
   const setCategories = (category: CategoryProps) => {
     console.log(category.id);
-    categories.value[category.id] = category;
+    categories.value.push(category);
   };
 
-  watch(activeCategory, (newTab) => {
-    console.log(activeCategory.value);
+  watch(activeCategory, (newCategory) => {
+    if (newCategory) {
+      selectedAttribueOption.value = Object.keys(
+        newCategory.attributes
+      )[0] as AttributeNameProps;
+    }
   });
+
+  const changeAttributeOption = (attributeOption: AttributeNameProps) => {
+    selectedAttribueOption.value = attributeOption;
+  };
 
   return {
     activeTab,
@@ -58,5 +64,7 @@ export const useTaskStore = () => {
     setActiveCategory: (category: CategoryProps | null) => {
       activeCategory.value = category;
     },
+    selectedAttribueOption,
+    changeAttributeOption,
   };
 };

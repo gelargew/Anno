@@ -1,3 +1,76 @@
+export const DUMMY_ATTRIBUTES = {
+  classCategory: [
+    {
+      id: 124,
+      categoryId: 49,
+      classCategoryName: "T-shirts",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+    {
+      id: 124,
+      categoryId: 41,
+      classCategoryName: "Jacket",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+  ],
+  subClassCategory: [
+    {
+      id: 823,
+      classCategoryId: 128,
+      subClassCategoryName: "Bow tie blouse",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+    {
+      id: 823,
+      classCategoryId: 128,
+      subClassCategoryName: "long Sleeves",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+  ],
+  classAttribute: [
+    {
+      id: 136,
+      classAttributeName: "Design pattern",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+    {
+      id: 136,
+      classAttributeName: "Comfort",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+  ],
+  attribute: [
+    {
+      id: 892,
+      classAttributeId: 136,
+      attributeName: "Plain",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+    {
+      id: 892,
+      classAttributeId: 136,
+      attributeName: "Loose",
+      version: "1",
+      createdAt: "2022-12-16T07:17:57.000Z",
+      updatedAt: "2022-12-16T07:17:57.000Z",
+    },
+  ],
+};
+
 export const DUMMY_CATEGORIES = [
   {
     id: 49,
@@ -7,6 +80,7 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
+    attributes: DUMMY_ATTRIBUTES,
   },
   {
     id: 1,
@@ -16,6 +90,7 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
+    attributes: DUMMY_ATTRIBUTES,
   },
   {
     id: 2,
@@ -25,6 +100,7 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
+    attributes: DUMMY_ATTRIBUTES,
   },
   {
     id: 3,
@@ -34,5 +110,6 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
+    attributes: DUMMY_ATTRIBUTES,
   },
 ];

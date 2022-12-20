@@ -15,6 +15,8 @@ const {
   setCategories,
   setActiveCategory,
   activeCategory,
+  selectedAttribueOption,
+  changeAttributeOption,
 } = useTaskStore();
 
 // ANNOTATIONS
@@ -42,10 +44,11 @@ const formatter = (annotation: any) => {
   if (selected) {
     foreignObject.innerHTML = `<label xmlns="http://www.w3.org/1999/xhtml">${selected.category}</label>`;
   }
+
   return {
     element: foreignObject,
     className: selected && "category" in selected ? "annotationLabels" : "",
-    style: "stroke: black;",
+    style: `stroke: black;`,
   };
 };
 
@@ -62,21 +65,31 @@ const innitAnno = () => {
 };
 onMounted(() => {
   innitAnno();
-  anno.on("cancelSelected", () => {
-    console.log("cancelSelected");
-    setActiveCategory(null);
-  });
+  // anno.on("cancelSelected", () => {
+  //   anno.readOnly = true;
+  // });
   anno.on("createSelection", async (selection: any) => {
     console.log(selection);
     if (activeCategory.value) {
-      setCategories({
-        ...activeCategory.value,
-        annotationData: selection,
-      });
       anno.saveSelected();
     } else {
       anno.cancelSelected();
     }
+    anno.readOnly = true;
+  });
+  anno.on("createAnnotation", (annotation: any) => {
+    if (activeCategory.value) {
+      setCategories({
+        ...activeCategory.value,
+        annotationData: annotation,
+      });
+    }
+    changeTab(TabsData[0]);
+    anno.selectAnnotation(annotation.id);
+  });
+  anno.on("clickAnnotation", (annotation: any) => {
+    console.log("clicked");
+    anno.readOnly = false;
   });
 });
 
@@ -121,59 +134,28 @@ const addAnno = (i: number) => {
   annotations.value.push(newAnnotation);
 };
 
-const saveAnno = () => {
-  const annotation = annotations.value.find(
-    (anno) => anno.id === selectedAnnotation.value
-  );
-  if (annotation) {
-    // annotation.body.attributes = labelData.value;
-    anno.updateSelected(annotation);
-    anno.cancelSelected();
-  } else {
-    anno.selectAnnotation(selectedAnnotation.value);
-  }
-};
-
-const updateAttribute = (key: string, value: string) => {
-  const annotation = annotations.value.find(
-    (anno) => anno.id === selectedAnnotation.value
-  );
-  if (annotation) {
-    annotation.body.attributes[key] = value;
-  }
-};
-
-const log = () => {};
-
-const onSelectCategory = (category: CategoryProps) => {
-  if (activeTab.value.id === 1) {
-    anno.readOnly = false;
-  }
-
-  const annotation = annotations.value.find(
-    (anno) => anno.id === selectedAnnotation.value
-  );
-  if (annotation) {
-    selectedCategory.value = annotation.body.category;
-  }
+const log = () => {
+  console.log(activeCategory.value);
 };
 
 watch([activeTab, activeCategory], (prev, next) => {
   if (prev[0].id != next[0].id) {
     // Every tab changes
-    setActiveCategory(null);
+    // setActiveCategory(null);
   }
   // on select report
-  if (activeTab.value.id === 6 && anno.readOnly) {
-    anno.readOnly = !anno.readOnly;
-  } else {
-    anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
-  }
+  // if (activeTab.value.id === 6 && anno.readOnly) {
+  //   anno.readOnly = !anno.readOnly;
+  // } else {
+  //   anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
+  // }
   // on label tab & select category
+
   if (activeTab.value.id === 1 && activeCategory.value) {
-    const selectCategory = categories.value[activeCategory.value.id.toString()];
+    const selectCategory = categories.value.find(
+      (c) => c.id === activeCategory.value?.id
+    );
     if (selectCategory) {
-      console.log(selectCategory.annotationData, "selectCategory");
       anno.selectAnnotation(selectCategory.annotationData);
       anno.disableSelect = anno.disableSelect
         ? anno.disableSelect
@@ -189,6 +171,9 @@ watch([activeTab, activeCategory], (prev, next) => {
     anno.disableSelect = anno.disableSelect
       ? anno.disableSelect
       : !anno.disableSelect;
+  }
+  if (activeCategory.value) {
+    anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
   }
 });
 </script>
@@ -213,8 +198,7 @@ watch([activeTab, activeCategory], (prev, next) => {
         v-for="tab in TabsData"
         :class="{
           active: tab.id === activeTab.id,
-          disabled:
-            tab.disabledWithoutCategory && Object.keys(categories).length,
+          disabled: tab.id != 6 && activeCategory === null,
         }"
       >
         <img :src="tab.iconUrl" />
@@ -239,7 +223,7 @@ watch([activeTab, activeCategory], (prev, next) => {
           <p>1 / 100</p>
           <a href="#">&gt;</a>
         </nav>
-        <button>SAVE</button>
+        <button v-if="activeCategory">SAVE</button>
       </div>
     </div>
     <!-- OPTIONS -->
@@ -247,9 +231,9 @@ watch([activeTab, activeCategory], (prev, next) => {
       <div
         class="category"
         :class="{
-          active: activeTab.id === 1 || activeTab.id === 3,
+          active: true,
         }"
-        v-if="true"
+        v-if="activeTab.id != 1"
       >
         <h4>Category</h4>
         <ul>
@@ -267,21 +251,10 @@ watch([activeTab, activeCategory], (prev, next) => {
       </div>
       <div v-else>
         <div class="flex">
-          <!-- <button v-if="labelStep" @click="() => labelStep--">back</button>
-          <h4>
-            {{ labelOptions[labelStep].title }}
-          </h4>
-          <button
-            v-if="labelStep + 1 < labelOptions.length"
-            @click="() => labelStep++"
-          >
-            next
-          </button> -->
-        </div>
-
-        <!-- <ul>
-          <fieldset
-            @change="
+          <h4>Attribute</h4>
+          <ul>
+            <fieldset
+              @change="
               (e) => {
 
                 if (labelOptions && e.target) {
@@ -290,20 +263,22 @@ watch([activeTab, activeCategory], (prev, next) => {
                 
               }
             "
-          >
-            <li v-for="attribute in labelOptions[labelStep].option">
-              <input
-                :checked="
-                  labelData[labelOptions[labelStep].title] === attribute
-                "
-                type="radio"
-                :name="labelOptions[labelStep].title"
-                :value="attribute"
-              />
-              <span>{{ attribute }}</span>
-            </li>
-          </fieldset>
-        </ul> -->
+            >
+              <li v-for="attribute in labelOptions[labelStep].option">
+                <input
+                  :checked="
+                    labelData[labelOptions[labelStep].title] === attribute
+                  "
+                  type="radio"
+                  :name="labelOptions[labelStep].title"
+                  :value="attribute"
+                />
+                <span>{{ attribute }}</span>
+              </li>
+            </fieldset>
+          </ul>
+        </div>
+
         <!-- <button
           v-if="labelStep + 1 < labelOptions.length"
           @click="() => labelStep++"
