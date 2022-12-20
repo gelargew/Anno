@@ -13,9 +13,11 @@ import Vue from "vue";
       <img alt="Vue logo" src="../assets/logo.png" class="logo" />
     </router-link>
     <router-link to="/test">Test</router-link>
+    <router-link to="/konva">Konva</router-link>
   </nav>
   <!-- <HelloWorld msg="Anno" /> -->
   <!-- <TaskPlatform /> -->
+
   <router-view />
 </template>
 

@@ -8,6 +8,8 @@ import { ObjectListType } from "../types";
 import { DEFAULT_ANNOTATION } from "../constants";
 import { assertNoop } from "@babel/types";
 
+const { activeTab, changeTab } = useTaskStore();
+
 const objectList = ref<{
   [key: string]: { attributes: { [key: string]: string | null } };
 }>({});
@@ -98,8 +100,7 @@ onMounted(() => {
     anno.cancelSelected();
   });
   anno.on("cancelSelected", function (selection: any) {
-    console.log(selection);
-    anno.selectAnnotation(selection);
+    anno.saveSelected();
   });
 });
 
@@ -192,7 +193,13 @@ const notReadOnly = () => {
   </button>
   <div class="container">
     <nav class="annotator-tabs">
-      <button v-for="tab in TabsData">
+      <button
+        @click="() => changeTab(tab)"
+        v-for="tab in TabsData"
+        :class="{
+          active: tab.id === activeTab.id,
+        }"
+      >
         <img src="#" />
         <p>{{ tab.title }}</p>
         <p>({{ tab.shortcut }})</p>
@@ -208,7 +215,13 @@ const notReadOnly = () => {
       </div>
     </div>
     <div class="options">
-      <div v-if="!labelOptions">
+      <div
+        class="category"
+        :class="{
+          active: activeTab.id === 1 || activeTab.id === 2,
+        }"
+        v-if="!labelOptions"
+      >
         <h4>Category</h4>
         <ul>
           <li v-for="(category, i) in DUMMY_CATEGORIES">
@@ -220,7 +233,7 @@ const notReadOnly = () => {
                 }
               "
             >
-              {{ category.name }}
+              ({{ category.id }}) {{ category.name }}
             </button>
           </li>
         </ul>
@@ -312,6 +325,12 @@ const notReadOnly = () => {
   display: flex;
   flex-wrap: nowrap;
   width: 100%;
+  background: white;
+  color: black;
+}
+
+.container * {
+  color: inherit;
 }
 
 .annotator-tabs {
@@ -322,6 +341,60 @@ const notReadOnly = () => {
 }
 .annotator-tabs button {
   padding: 0.8rem;
+  color: black;
+  font-size: 0.8rem;
+  border: none;
+  outline: none;
+}
+
+.annotator-tabs button.active {
+  background: #0085ff;
+}
+
+.options {
+  flex: 1;
+}
+
+.options h4 {
+  padding-left: 1rem;
+}
+
+.options li {
+  padding-left: 1.2rem;
+}
+
+.options ul {
+  padding-left: 0;
+  list-style: none;
+}
+.options h4 {
+  font-weight: 700;
+  line-height: 1.2em;
+}
+
+.category {
+  opacity: 0.6;
+  pointer-events: none;
+}
+.category.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.category li {
+  line-height: 2.5em;
+  font-size: 0.8rem;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.category li:hover {
+  background: #0085ff;
+  color: white;
+}
+
+.category li button {
+  text-transform: uppercase;
 }
 
 .flex {
@@ -330,7 +403,7 @@ const notReadOnly = () => {
 
 .annotatorWrapper {
   height: 40vw;
-  aspect-ratio: 16/9;
+  aspect-ratio: 9/6;
   position: relative;
   background: #222a35;
 }

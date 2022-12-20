@@ -1,68 +1,39 @@
+export interface TabsProps {
+  title: string;
+  shortcut: string;
+  id: number;
+}
+
 export const TabsData = [
   {
     title: "Attribute",
-    shortcut: "E",
+    shortcut: "e",
     id: 1,
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
   },
   {
     title: "Labels",
-    shortcut: "T",
+    shortcut: "t",
     id: 2,
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
   },
   {
     title: "Group",
-    shortcut: "G",
+    shortcut: "g",
     id: 3,
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
   },
   {
     title: "Fit Width",
-    shortcut: "Space",
+    shortcut: "space",
     id: 4,
-    classes: [
-      {
-        title: "class",
-        option: ["shirt", "blouse"],
-      },
-      {
-        title: "subclass",
-        option: ["formal", "denim"],
-      },
-    ],
+  },
+  {
+    title: "Feedback",
+    shortcut: "f",
+    id: 5,
   },
   {
     title: "Report",
-    shortcut: "T",
-    id: 5,
+    shortcut: "t",
+    id: 6,
   },
 ];
 
