@@ -8,7 +8,14 @@ import { ObjectListType } from "../types";
 import { DEFAULT_ANNOTATION } from "../constants";
 import { assertNoop } from "@babel/types";
 
-const { activeTab, changeTab } = useTaskStore();
+const {
+  activeTab,
+  changeTab,
+  categories,
+  setCategories,
+  setActiveCategory,
+  activeCategory,
+} = useTaskStore();
 
 const objectList = ref<{
   [key: string]: { attributes: { [key: string]: string | null } };
@@ -172,11 +179,17 @@ const log = () => {
   console.log(annotations.value);
 };
 
-const readOnly = () => {
-  anno.readOnly = true;
-};
-const notReadOnly = () => {
-  anno.readOnly = false;
+const onSelectCategory = (category: string) => {
+  if (activeTab.value.id === 1) {
+    anno.readOnly = false;
+  }
+
+  const annotation = annotations.value.find(
+    (anno) => anno.id === selectedAnnotation.value
+  );
+  if (annotation) {
+    selectedCategory.value = annotation.body.category;
+  }
 };
 </script>
 
@@ -200,7 +213,7 @@ const notReadOnly = () => {
           active: tab.id === activeTab.id,
         }"
       >
-        <img src="#" />
+        <img :src="tab.iconUrl" />
         <p>{{ tab.title }}</p>
         <p>({{ tab.shortcut }})</p>
       </button>
@@ -225,14 +238,7 @@ const notReadOnly = () => {
         <h4>Category</h4>
         <ul>
           <li v-for="(category, i) in DUMMY_CATEGORIES">
-            <button
-              @click="
-                () => {
-                  currentObjectIndex = i;
-                  addAnno(i);
-                }
-              "
-            >
+            <button @click="() => onSelectCategory(category)">
               ({{ category.id }}) {{ category.name }}
             </button>
           </li>
@@ -305,8 +311,6 @@ const notReadOnly = () => {
           </li>
         </ul>
       </div>
-
-      <h1>OPTIONS</h1>
     </div>
   </div>
   <div>
@@ -357,6 +361,9 @@ const notReadOnly = () => {
 
 .options h4 {
   padding-left: 1rem;
+}
+.options input {
+  accent-color: blue;
 }
 
 .options li {

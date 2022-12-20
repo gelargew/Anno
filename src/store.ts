@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { TabsData, TabsProps } from "./components/TabsData";
 
 type ActiveTabs =
@@ -9,10 +9,24 @@ type ActiveTabs =
   | "fit-width"
   | "group";
 
+interface CategoryProps {
+  name: string;
+  id: string;
+  classes: {
+    title: string;
+    option: string[];
+  }[];
+}
+
 export const useTaskStore = () => {
   const activeTab = ref<TabsProps>(TabsData[5]);
   const action = ref<ActiveTabs>("report");
   const annotations = ref<any[]>([]);
+  const activeCategory = ref<CategoryProps | null>(null);
+  const categories = ref<{
+    [key: string]: CategoryProps;
+  }>({});
+  let anno = null;
 
   const addAnnotation = (annotation: any) => {
     annotations.value.push(annotation);
@@ -21,5 +35,26 @@ export const useTaskStore = () => {
     activeTab.value = tab;
   };
 
-  return { activeTab, annotations, addAnnotation, action, changeTab };
+  const setCategories = (category: CategoryProps) => {
+    categories.value[category.id] = category;
+  };
+
+  watch(activeCategory, (newTab) => {
+    console.log(activeCategory.value);
+  });
+
+  return {
+    activeTab,
+    annotations,
+    addAnnotation,
+    action,
+    changeTab,
+    anno,
+    categories,
+    setCategories,
+    activeCategory,
+    setActiveCategory: (category: CategoryProps) => {
+      activeCategory.value = category;
+    },
+  };
 };
