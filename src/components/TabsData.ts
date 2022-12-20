@@ -17,36 +17,42 @@ export const TabsData = [
     shortcut: "e",
     id: 1,
     iconUrl: AttributeIcon,
+    disabledWithoutCategory: true,
   },
   {
     title: "Labels",
     shortcut: "t",
     id: 2,
     iconUrl: LabelsIcon,
+    disabledWithoutCategory: false,
   },
   {
     title: "Group",
     shortcut: "g",
     id: 3,
     iconUrl: GroupIcon,
+    disabledWithoutCategory: true,
   },
   {
     title: "Fit Width",
     shortcut: "space",
     id: 4,
     iconUrl: fitWidthIcon,
+    disabledWithoutCategory: true,
   },
   {
     title: "Feedback",
     shortcut: "f",
     id: 5,
     iconUrl: FeedbackIcon,
+    disabledWithoutCategory: true,
   },
   {
     title: "Report",
     shortcut: "t",
     id: 6,
     iconUrl: ReportIcon,
+    disabledWithoutCategory: false,
   },
 ];
 

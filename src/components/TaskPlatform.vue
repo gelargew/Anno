@@ -7,7 +7,7 @@ import "../styles/annotorious.css";
 import { ObjectListType } from "../types";
 import { DEFAULT_ANNOTATION } from "../constants";
 import { assertNoop } from "@babel/types";
-
+import { CategoryProps } from "../store";
 const {
   activeTab,
   changeTab,
@@ -17,56 +17,11 @@ const {
   activeCategory,
 } = useTaskStore();
 
-const objectList = ref<{
-  [key: string]: { attributes: { [key: string]: string | null } };
-}>({});
-const selectedObject = ref<typeof DUMMY_CATEGORIES[0] | null>(null);
-const currentObjectIndex = ref<"none" | number>("none");
-const currentAttributeStep = ref(0);
-
-// LABELS
-const labelOptions = ref<{ title: string; option: string[] }[] | null>(null);
-const labelStep = ref(0);
-const labelData = ref<{ [key: string]: string | null }>({});
-
-const saveLabel = () => {
-  const object = {
-    category: selectedObject.value?.name,
-    attributes: labelData.value,
-  };
-  console.log(object);
-  if (currentObjectIndex.value !== "none") {
-    objectList.value[DUMMY_CATEGORIES[currentObjectIndex.value].name] = object;
-  }
-  currentObjectIndex.value = "none";
-  labelOptions.value = null;
-  labelStep.value = 0;
-  labelData.value = {};
-};
-
-watch(
-  () => currentObjectIndex.value,
-  (newVal) => {
-    if (newVal !== "none") {
-      labelOptions.value = DUMMY_CATEGORIES[newVal].classes;
-      labelData.value = DUMMY_CATEGORIES[newVal].classes.reduce(
-        (acc, cur) => ({ ...acc, [cur.title]: null }),
-        {}
-      );
-    }
-    console.log(labelData.value);
-  }
-);
-
 // ANNOTATIONS
 const annotations = ref<any[]>([]);
 const img = ref(null);
 const selectedAnnotation = ref<any>(null);
 const selectedCategory = ref("tops");
-const layouts = reactive({
-  comments: true,
-  labels: true,
-});
 let anno: any = null;
 
 function* idGenerator() {
@@ -99,6 +54,9 @@ const innitAnno = () => {
     widgets: [],
     allowEmpty: true,
     formatter: formatter,
+    disableEditor: true,
+    disableSelect: true,
+    readOnly: true,
   });
 };
 onMounted(() => {
@@ -111,19 +69,18 @@ onMounted(() => {
   });
 });
 
-watch(layouts, () => {
-  const labels = document.querySelectorAll(".annotationLabels");
-  if (layouts.labels) {
-    labels.forEach((el) => {
-      el.classList.remove("none");
-    });
-  } else {
-    labels.forEach((el) => {
-      el.classList.add("none");
-    });
-  }
-  console.log(labels);
-});
+// watch(layouts, () => {
+//   const labels = document.querySelectorAll(".annotationLabels");
+//   if (layouts.labels) {
+//     labels.forEach((el) => {
+//       el.classList.remove("none");
+//     });
+//   } else {
+//     labels.forEach((el) => {
+//       el.classList.add("none");
+//     });
+//   }
+// });
 
 const addAnno = (i: number) => {
   const category = DUMMY_CATEGORIES[i].name;
@@ -158,7 +115,7 @@ const saveAnno = () => {
     (anno) => anno.id === selectedAnnotation.value
   );
   if (annotation) {
-    annotation.body.attributes = labelData.value;
+    // annotation.body.attributes = labelData.value;
     anno.updateSelected(annotation);
     anno.cancelSelected();
   } else {
@@ -179,7 +136,7 @@ const log = () => {
   console.log(annotations.value);
 };
 
-const onSelectCategory = (category: string) => {
+const onSelectCategory = (category: CategoryProps) => {
   if (activeTab.value.id === 1) {
     anno.readOnly = false;
   }
@@ -191,9 +148,35 @@ const onSelectCategory = (category: string) => {
     selectedCategory.value = annotation.body.category;
   }
 };
+
+watch([activeTab, activeCategory], (prev, next) => {
+  if (prev[0].id != next[0].id) {
+    // Every tab changes
+    setActiveCategory(null);
+  }
+  // on select report
+  if (activeTab.value.id === 6 && anno.readOnly) {
+    anno.readOnly = !anno.readOnly;
+  } else {
+    anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
+  }
+  // on label tab & select category
+  if (activeTab.value.id === 2 && activeCategory.value) {
+    anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
+    anno.disableSelect = anno.disableSelect
+      ? !anno.disableSelect
+      : anno.disableSelect;
+  } else {
+    anno.readOnly = anno.readOnly ? anno.readOnly : !anno.readOnly;
+    anno.disableSelect = anno.disableSelect
+      ? anno.disableSelect
+      : !anno.disableSelect;
+  }
+});
 </script>
 
 <template>
+  <!-- HEADER -->
   <button @click="log">LOG</button>
   <button
     @click="
@@ -205,12 +188,15 @@ const onSelectCategory = (category: string) => {
     TOGGLE READ ONlY
   </button>
   <div class="container">
+    <!-- TABS -->
     <nav class="annotator-tabs">
       <button
         @click="() => changeTab(tab)"
         v-for="tab in TabsData"
         :class="{
           active: tab.id === activeTab.id,
+          disabled:
+            tab.disabledWithoutCategory && Object.keys(categories).length,
         }"
       >
         <img :src="tab.iconUrl" />
@@ -218,6 +204,7 @@ const onSelectCategory = (category: string) => {
         <p>({{ tab.shortcut }})</p>
       </button>
     </nav>
+    <!-- ANNOTATOR -->
     <div class="annotatorWrapper">
       <div class="imgWrapper">
         <img
@@ -227,18 +214,24 @@ const onSelectCategory = (category: string) => {
         />
       </div>
     </div>
+    <!-- OPTIONS -->
     <div class="options">
       <div
         class="category"
         :class="{
           active: activeTab.id === 1 || activeTab.id === 2,
         }"
-        v-if="!labelOptions"
+        v-if="activeTab.id != 1"
       >
         <h4>Category</h4>
         <ul>
-          <li v-for="(category, i) in DUMMY_CATEGORIES">
-            <button @click="() => onSelectCategory(category)">
+          <li
+            :class="{
+              active: activeCategory && activeCategory.id === category.id,
+            }"
+            v-for="(category, i) in DUMMY_CATEGORIES"
+          >
+            <button @click="() => setActiveCategory(category)">
               ({{ category.id }}) {{ category.name }}
             </button>
           </li>
@@ -246,7 +239,7 @@ const onSelectCategory = (category: string) => {
       </div>
       <div v-else>
         <div class="flex">
-          <button v-if="labelStep" @click="() => labelStep--">back</button>
+          <!-- <button v-if="labelStep" @click="() => labelStep--">back</button>
           <h4>
             {{ labelOptions[labelStep].title }}
           </h4>
@@ -255,10 +248,10 @@ const onSelectCategory = (category: string) => {
             @click="() => labelStep++"
           >
             next
-          </button>
+          </button> -->
         </div>
 
-        <ul>
+        <!-- <ul>
           <fieldset
             @change="
               (e) => {
@@ -282,8 +275,8 @@ const onSelectCategory = (category: string) => {
               <span>{{ attribute }}</span>
             </li>
           </fieldset>
-        </ul>
-        <button
+        </ul> -->
+        <!-- <button
           v-if="labelStep + 1 < labelOptions.length"
           @click="() => labelStep++"
         >
@@ -299,9 +292,9 @@ const onSelectCategory = (category: string) => {
           "
         >
           Submit
-        </button>
+        </button> -->
       </div>
-      <div v-if="currentObjectIndex === 'none'">
+      <!-- <div v-if="currentObjectIndex === 'none'">
         <h4>Object List</h4>
         <ul>
           <li v-for="(value, key) in objectList" :key="key">
@@ -310,10 +303,10 @@ const onSelectCategory = (category: string) => {
             </span>
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
   </div>
-  <div>
+  <!-- <div>
     <pre>{{ JSON.stringify(objectList) }}</pre>
     <ul>
       <pre v-for="obj in annotations.values()" :key="obj.id">
@@ -321,7 +314,7 @@ const onSelectCategory = (category: string) => {
       >
     </ul>
     <pre>{{ JSON.stringify(labelData) }}</pre>
-  </div>
+  </div> -->
 </template>
 
 <style scoped>
@@ -353,6 +346,10 @@ const onSelectCategory = (category: string) => {
 
 .annotator-tabs button.active {
   background: #0085ff;
+  color: white;
+}
+.annotator-tabs button.active img {
+  filter: invert(1);
 }
 
 .options {
@@ -395,13 +392,19 @@ const onSelectCategory = (category: string) => {
   cursor: pointer;
 }
 
-.category li:hover {
+.category li:hover,
+.category li.active {
   background: #0085ff;
   color: white;
 }
 
 .category li button {
   text-transform: uppercase;
+  display: block;
+  height: 100%;
+  width: 100%;
+  text-align: left;
+  line-height: 2.5em;
 }
 
 .flex {

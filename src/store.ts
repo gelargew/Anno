@@ -9,13 +9,14 @@ type ActiveTabs =
   | "fit-width"
   | "group";
 
-interface CategoryProps {
+export interface CategoryProps {
   name: string;
   id: string;
   classes: {
     title: string;
     option: string[];
   }[];
+  annotationData?: any;
 }
 
 export const useTaskStore = () => {
@@ -53,7 +54,7 @@ export const useTaskStore = () => {
     categories,
     setCategories,
     activeCategory,
-    setActiveCategory: (category: CategoryProps) => {
+    setActiveCategory: (category: CategoryProps | null) => {
       activeCategory.value = category;
     },
   };
