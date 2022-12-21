@@ -82,6 +82,9 @@ onMounted(() => {
   anno.on("startSelection", (annotation: any) => {
     console.log(annotation);
   });
+  anno.on("clickAnnotation", (annotation: any) => {
+    console.log(annotation);
+  });
 });
 
 watch(layouts, () => {

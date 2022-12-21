@@ -7,14 +7,12 @@ export interface ObjectListType {
 }
 
 export type AttributeOptionProps = [
-  "category",
   "classCategory",
   "subClassCategory",
   "classAttribute",
   "attribute"
 ];
 export type AttributeNameProps =
-  | "category"
   | "classCategory"
   | "subClassCategory"
   | "classAttribute"

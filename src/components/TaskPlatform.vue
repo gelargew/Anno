@@ -6,8 +6,7 @@ import { Annotorious } from "@recogito/annotorious";
 import "../styles/annotorious.css";
 import { ObjectListType } from "../types";
 import { DEFAULT_ANNOTATION } from "../constants";
-import { assertNoop } from "@babel/types";
-import { CategoryProps } from "../store";
+import { DUMMY_ATTRIBUTES_OPTIONS } from "../dummy/category";
 const {
   activeTab,
   changeTab,
@@ -15,8 +14,9 @@ const {
   setCategories,
   setActiveCategory,
   activeCategory,
-  selectedAttribueOption,
-  changeAttributeOption,
+  selectedAttributeOption,
+  setAttributeOption,
+  selectedAttributes,
 } = useTaskStore();
 
 // ANNOTATIONS
@@ -65,17 +65,17 @@ const innitAnno = () => {
 };
 onMounted(() => {
   innitAnno();
-  // anno.on("cancelSelected", () => {
-  //   anno.readOnly = true;
-  // });
+  anno.on("cancelSelected", () => {
+    anno.readOnly = anno.readOnly ? anno.readOnly : !anno.readOnly;
+    changeTab(null);
+    setActiveCategory(null);
+  });
   anno.on("createSelection", async (selection: any) => {
-    console.log(selection);
     if (activeCategory.value) {
       anno.saveSelected();
     } else {
       anno.cancelSelected();
     }
-    anno.readOnly = true;
   });
   anno.on("createAnnotation", (annotation: any) => {
     if (activeCategory.value) {
@@ -86,10 +86,6 @@ onMounted(() => {
     }
     changeTab(TabsData[0]);
     anno.selectAnnotation(annotation.id);
-  });
-  anno.on("clickAnnotation", (annotation: any) => {
-    console.log("clicked");
-    anno.readOnly = false;
   });
 });
 
@@ -135,11 +131,11 @@ const addAnno = (i: number) => {
 };
 
 const log = () => {
-  console.log(activeCategory.value);
+  console.log(categories.value);
 };
 
-watch([activeTab, activeCategory], (prev, next) => {
-  if (prev[0].id != next[0].id) {
+watch([activeTab, activeCategory], (next, prev) => {
+  if (prev[0]?.id != next[0]?.id) {
     // Every tab changes
     // setActiveCategory(null);
   }
@@ -149,12 +145,14 @@ watch([activeTab, activeCategory], (prev, next) => {
   // } else {
   //   anno.readOnly = anno.readOnly ? !anno.readOnly : anno.readOnly;
   // }
-  // on label tab & select category
 
-  if (activeTab.value.id === 1 && activeCategory.value) {
+  // on every category changes
+  if (next[1]?.id != prev[1]?.id) {
+    // on label tab & select category
     const selectCategory = categories.value.find(
       (c) => c.id === activeCategory.value?.id
     );
+    console.log(selectCategory, "selectcategory");
     if (selectCategory) {
       anno.selectAnnotation(selectCategory.annotationData);
       anno.disableSelect = anno.disableSelect
@@ -166,6 +164,11 @@ watch([activeTab, activeCategory], (prev, next) => {
         ? !anno.disableSelect
         : anno.disableSelect;
     }
+  }
+
+  // on label tab & select category
+  console.log(activeCategory.value, next[0]?.id);
+  if (next[0]?.id === 1 && activeCategory.value) {
   } else {
     anno.readOnly = anno.readOnly ? anno.readOnly : !anno.readOnly;
     anno.disableSelect = anno.disableSelect
@@ -197,7 +200,7 @@ watch([activeTab, activeCategory], (prev, next) => {
         @click="() => changeTab(tab)"
         v-for="tab in TabsData"
         :class="{
-          active: tab.id === activeTab.id,
+          active: tab.id === activeTab?.id,
           disabled: tab.id != 6 && activeCategory === null,
         }"
       >
@@ -233,7 +236,7 @@ watch([activeTab, activeCategory], (prev, next) => {
         :class="{
           active: true,
         }"
-        v-if="activeTab.id != 1"
+        v-if="activeTab?.id != 1"
       >
         <h4>Category</h4>
         <ul>
@@ -243,7 +246,17 @@ watch([activeTab, activeCategory], (prev, next) => {
             }"
             v-for="(category, i) in DUMMY_CATEGORIES"
           >
-            <button @click="() => setActiveCategory(category)">
+            <button
+              @click="
+                () => {
+                  anno.saveSelected();
+                  anno.readOnly = anno.readOnly
+                    ? !anno.readOnly
+                    : anno.readOnly;
+                  setActiveCategory(category);
+                }
+              "
+            >
               ({{ category.id }}) {{ category.name }}
             </button>
           </li>
@@ -253,49 +266,70 @@ watch([activeTab, activeCategory], (prev, next) => {
         <div class="flex">
           <h4>Attribute</h4>
           <ul>
-            <fieldset
-              @change="
-              (e) => {
-
-                if (labelOptions && e.target) {
-                  updateAttribute(labelOptions[labelStep].title, (e.target as HTMLInputElement).value);
-                }
-                
-              }
-            "
-            >
-              <li v-for="attribute in labelOptions[labelStep].option">
+            <fieldset v-if="selectedAttributeOption === 0">
+              <li v-for="attribute in DUMMY_ATTRIBUTES_OPTIONS.classCategory">
                 <input
-                  :checked="
-                    labelData[labelOptions[labelStep].title] === attribute
-                  "
                   type="radio"
-                  :name="labelOptions[labelStep].title"
+                  :id="attribute.classCategoryName"
+                  name="classCategory"
                   :value="attribute"
                 />
-                <span>{{ attribute }}</span>
+                <label :for="attribute.classCategoryName">{{
+                  attribute.classCategoryName
+                }}</label>
+              </li>
+            </fieldset>
+            <fieldset v-if="selectedAttributeOption === 1">
+              <li
+                v-for="attribute in DUMMY_ATTRIBUTES_OPTIONS.subClassCategory"
+              >
+                <input
+                  type="radio"
+                  :id="attribute.subClassCategoryName"
+                  name="subClassCategory"
+                  :value="attribute"
+                />
+                <label :for="attribute.subClassCategoryName">{{
+                  attribute.subClassCategoryName
+                }}</label>
+              </li>
+            </fieldset>
+            <fieldset v-if="selectedAttributeOption === 2">
+              <li v-for="attribute in DUMMY_ATTRIBUTES_OPTIONS.classAttribute">
+                <input
+                  type="radio"
+                  :id="attribute.classAttributeName"
+                  name="classAttribute"
+                  :value="attribute"
+                />
+                <label :for="attribute.classAttributeName">{{
+                  attribute.classAttributeName
+                }}</label>
+              </li>
+            </fieldset>
+            <fieldset v-if="selectedAttributeOption === 3">
+              <li v-for="attribute in DUMMY_ATTRIBUTES_OPTIONS.attribute">
+                <input
+                  type="radio"
+                  :id="attribute.attributeName"
+                  name="attribute"
+                  :value="attribute"
+                />
+                <label :for="attribute.attributeName">{{
+                  attribute.attributeName
+                }}</label>
               </li>
             </fieldset>
           </ul>
         </div>
 
-        <!-- <button
-          v-if="labelStep + 1 < labelOptions.length"
-          @click="() => labelStep++"
+        <button
+          v-if="selectedAttributeOption < 3"
+          @click="() => setAttributeOption(selectedAttributeOption + 1)"
         >
           Next
         </button>
-        <button
-          v-else
-          @click="
-            () => {
-              saveLabel();
-              saveAnno();
-            }
-          "
-        >
-          Submit
-        </button> -->
+        <button v-else @click="() => {}">Submit</button>
       </div>
       <!-- <div v-if="currentObjectIndex === 'none'">
         <h4>Object List</h4>
@@ -321,6 +355,10 @@ watch([activeTab, activeCategory], (prev, next) => {
 </template>
 
 <style scoped>
+.none {
+  display: none;
+}
+
 .container {
   display: flex;
   flex-wrap: nowrap;

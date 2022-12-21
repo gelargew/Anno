@@ -13,24 +13,41 @@ type ActiveTabs =
 export interface CategoryProps {
   name: string;
   id: string;
-  attributes: AttributeOptionProps;
   annotationData?: any;
 }
 
+const a = {
+  classAttribute: null,
+  classCategory: null,
+  subClassCategory: null,
+  attribute: null,
+};
+
 export const useTaskStore = () => {
-  const activeTab = ref<TabsProps>(TabsData[5]);
+  const activeTab = ref<TabsProps | null>(TabsData[5]);
   const action = ref<ActiveTabs>("report");
   const annotations = ref<any[]>([]);
   const activeCategory = ref<CategoryProps | null>(null);
   const categories = ref<CategoryProps[]>([]);
-  const selectedAttribueOption = ref<AttributeNameProps | null>(null);
+  const selectedAttributeOption = ref(0);
+  const selectedAttributes = ref<{
+    classAttribute: null | string;
+    classCategory: null | string;
+    subClassCategory: null | string;
+    attribute: null | string;
+  }>({
+    classAttribute: null,
+    classCategory: null,
+    subClassCategory: null,
+    attribute: null,
+  });
 
   let anno = null;
 
   const addAnnotation = (annotation: any) => {
     annotations.value.push(annotation);
   };
-  const changeTab = (tab: TabsProps) => {
+  const changeTab = (tab: TabsProps | null) => {
     activeTab.value = tab;
   };
 
@@ -41,14 +58,12 @@ export const useTaskStore = () => {
 
   watch(activeCategory, (newCategory) => {
     if (newCategory) {
-      selectedAttribueOption.value = Object.keys(
-        newCategory.attributes
-      )[0] as AttributeNameProps;
+      selectedAttributeOption.value = 0;
     }
   });
 
-  const changeAttributeOption = (attributeOption: AttributeNameProps) => {
-    selectedAttribueOption.value = attributeOption;
+  const setAttributeOption = (attributeOption: number) => {
+    selectedAttributeOption.value = attributeOption;
   };
 
   return {
@@ -64,7 +79,8 @@ export const useTaskStore = () => {
     setActiveCategory: (category: CategoryProps | null) => {
       activeCategory.value = category;
     },
-    selectedAttribueOption,
-    changeAttributeOption,
+    selectedAttributeOption,
+    setAttributeOption,
+    selectedAttributes,
   };
 };

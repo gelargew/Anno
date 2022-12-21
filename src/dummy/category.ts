@@ -1,4 +1,4 @@
-export const DUMMY_ATTRIBUTES = {
+export const DUMMY_ATTRIBUTES_OPTIONS = {
   classCategory: [
     {
       id: 124,
@@ -80,7 +80,7 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
-    attributes: DUMMY_ATTRIBUTES,
+    attributes: DUMMY_ATTRIBUTES_OPTIONS,
   },
   {
     id: 1,
@@ -90,7 +90,7 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
-    attributes: DUMMY_ATTRIBUTES,
+    attributes: DUMMY_ATTRIBUTES_OPTIONS,
   },
   {
     id: 2,
@@ -100,7 +100,7 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
-    attributes: DUMMY_ATTRIBUTES,
+    attributes: DUMMY_ATTRIBUTES_OPTIONS,
   },
   {
     id: 3,
@@ -110,6 +110,6 @@ export const DUMMY_CATEGORIES = [
     createdAt: "2022-12-16T07:17:57.000Z",
     updatedAt: "2022-12-16T07:17:57.000Z",
     function_types: true,
-    attributes: DUMMY_ATTRIBUTES,
+    attributes: DUMMY_ATTRIBUTES_OPTIONS,
   },
 ];
