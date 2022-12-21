@@ -9,9 +9,7 @@ import Vue from "vue";
 
 <template>
   <nav>
-    <router-link to="/">
-      <img alt="Vue logo" src="../assets/logo.png" class="logo" />
-    </router-link>
+    <router-link to="/"> HOME </router-link>
     <router-link to="/test">Test</router-link>
     <router-link to="/konva">Konva</router-link>
   </nav>
